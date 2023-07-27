@@ -1,3 +1,12 @@
 (library
-  (name backoff)
-  (public_name backoff))
+ (name backoff)
+ (public_name backoff))
+
+(rule
+ (targets domain.ml)
+ (deps domain.ocaml4.ml)
+ (enabled_if
+  (< %{ocaml_version} 5.0.0))
+ (action
+  (progn
+   (copy domain.ocaml4.ml domain.ml))))
