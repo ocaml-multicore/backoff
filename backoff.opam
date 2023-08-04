@@ -9,6 +9,7 @@ bug-reports: "https://github.com/ocaml-multicore/backoff/issues"
 depends: [
   "dune" {>= "3.3"}
   "ocaml" {>= "4.13"}
+  "alcotest" {>= "1.7.0" & with-test}
   "domain_shims" {>= "0.1.0" & with-test}
   "odoc" {with-doc}
 ]
