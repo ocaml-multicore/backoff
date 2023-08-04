@@ -85,7 +85,7 @@ let test_taslock ?(gnuplot = false) () =
                Gc.major ();
                let mean = mean ~cut_minmax:(nround / 20) data in
                (ndomain, mean)))
-            [ 1; 2; 3; 4; 5; 6; 7] ))
+            [ 1; 2; 3; 4; 5; 6; 7 ] ))
       all_lock
   in
   print ~gnuplot res

@@ -1,3 +1,3 @@
 (executables
  (names test_tas)
- (libraries backoff unix))
+ (libraries domain_shims backoff unix))

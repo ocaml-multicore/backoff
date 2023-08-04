@@ -1,12 +1,24 @@
+(* -*- tuareg -*- *)
+
+let maybe_threads =
+  if Jbuild_plugin.V1.ocaml_version < "5" then "threads" else ""
+
+let () =
+  Jbuild_plugin.V1.send
+  @@ {|
+
 (library
  (name backoff)
- (public_name backoff))
+ (public_name backoff)
+ (libraries |}
+  ^ maybe_threads
+  ^ {| ))
 
 (rule
  (targets domain.ml)
  (deps domain.ocaml4.ml)
- (enabled_if
-  (< %{ocaml_version} 5.0.0))
+ (enabled_if (< %{ocaml_version} 5.0.0))
  (action
   (progn
    (copy domain.ocaml4.ml domain.ml))))
+|}
