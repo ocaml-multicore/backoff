@@ -1,2 +1,15 @@
-(lang dune 3.0)
+(lang dune 3.3)
 (name backoff)
+(generate_opam_files true)
+(source (github ocaml-multicore/backoff))
+(authors "KC Sivaramakrishnan <sk826@cl.cam.ac.uk>")
+(maintainers "Carine Morel <carine@tarides.com>")
+(homepage "https://github.com/ocaml-multicore/backoff")
+(license ISC)
+
+(package
+ (name backoff)
+ (synopsis "Exponential backoff mechanism for OCaml")
+ (depends
+  (ocaml (>= 4.13))
+  (domain_shims (and (>= 0.1.0) :with-test))))
