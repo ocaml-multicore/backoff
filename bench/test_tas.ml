@@ -85,7 +85,7 @@ let test_taslock ?(gnuplot = false) () =
                Gc.major ();
                let mean = mean ~cut_minmax:(nround / 20) data in
                (ndomain, mean)))
-            [ 1; 2; 4; 6; 8 ] ))
+            [ 1; 2; 3; 4; 5; 6; 7] ))
       all_lock
   in
   print ~gnuplot res
@@ -94,7 +94,7 @@ let _ = test_taslock ~gnuplot:true ()
 
 (*
 
-dune exec ./main.exe > bench.data
+dune exec ./bench/test_taslock.exe > bench.data
 
 gnuplot -p -e 'plot for [col=2:4] "bench.data" using 1:col with lines title columnheader'
 

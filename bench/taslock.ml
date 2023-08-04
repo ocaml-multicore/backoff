@@ -14,10 +14,10 @@ module TASlock : LOCK = struct
 
   let create () = Atomic.make false
 
-  let acquire t =
-    while not @@ Atomic.compare_and_set t false true do
-      Domain.cpu_relax ()
-    done
+  let rec acquire t =
+    if not @@ Atomic.compare_and_set t false true then (
+      Domain.cpu_relax ();
+      acquire t)
 
   let release t = Atomic.set t false
 end
@@ -27,17 +27,13 @@ module TTASlock : LOCK = struct
 
   let create () = Atomic.make false
 
-  exception Lock_acquired
-
-  let acquire t =
-    try
-      while true do
-        while Atomic.get t do
-          Domain.cpu_relax ()
-        done;
-        if Atomic.compare_and_set t false true then raise Lock_acquired
-      done
-    with Lock_acquired -> ()
+  let rec acquire t =
+    if Atomic.get t then (
+      Domain.cpu_relax ();
+      acquire t)
+    else if not (Atomic.compare_and_set t false true) then (
+      Domain.cpu_relax ();
+      acquire t)
 
   let release t = Atomic.set t false
 end
@@ -47,18 +43,13 @@ module TTASlock_boff : LOCK = struct
 
   let create () = Atomic.make false
 
-  exception Lock_acquired
+  let rec acquire_ ?(backoff = Backoff.default) t =
+    if Atomic.get t then (
+      Domain.cpu_relax ();
+      acquire_ ~backoff t)
+    else if not (Atomic.compare_and_set t false true) then
+      acquire_ ~backoff:(Backoff.once backoff) t
 
-  let acquire t =
-    let backoff = ref @@ Backoff.create () in
-    try
-      while true do
-        while Atomic.get t do
-          backoff := Backoff.once !backoff
-        done;
-        if Atomic.compare_and_set t false true then raise Lock_acquired
-      done
-    with Lock_acquired -> ()
-
+  let acquire t = acquire_ t
   let release t = Atomic.set t false
 end
