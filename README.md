@@ -1,4 +1,4 @@
-[API reference](TODO)
+[API reference](https://ocaml-multicore.github.io/backoff/doc/backoff/Backoff/index.html)
 
 # backoff - exponential backoff mechanism
 
