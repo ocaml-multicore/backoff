@@ -2,7 +2,7 @@
 (name backoff)
 (generate_opam_files true)
 (source (github ocaml-multicore/backoff))
-(authors "KC Sivaramakrishnan <sk826@cl.cam.ac.uk>")
+(authors "KC Sivaramakrishnan <kc@tarides.com>")
 (maintainers "Carine Morel <carine@tarides.com>")
 (homepage "https://github.com/ocaml-multicore/backoff")
 (license ISC)
