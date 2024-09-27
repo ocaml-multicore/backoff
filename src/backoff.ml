@@ -40,15 +40,27 @@ let reset backoff =
   let lower_wait_log = get_lower_wait_log backoff in
   backoff land lnot mask lor lower_wait_log
 
-let once backoff =
+(* We don't want [once] to be inlined.  This may avoid code bloat. *)
+let[@inline never] once backoff =
+  (* We call [Random.bits] first.  In this case this helps to reduce register
+     pressure so that fewer words will be allocated from the stack. *)
+  let t = Random.bits () in
   let wait_log = get_wait_log backoff in
   let wait_mask = (1 lsl wait_log) - 1 in
-  let t = Random.bits () land wait_mask land single_mask in
-  for _ = 0 to t do
-    Domain.cpu_relax ()
+  (* We use a ref and a countdown while-loop (uses one variable) instead of a
+     for-loop (uses two variables) to reduce register pressure.  Local ref does
+     not allocate with native compiler. *)
+  let t = ref (t land wait_mask land single_mask) in
+  while 0 <= !t do
+    Domain.cpu_relax ();
+    t := !t - 1
   done;
   let upper_wait_log = get_upper_wait_log backoff in
-  let next_wait_log = Int.min upper_wait_log (wait_log + 1) in
-  backoff lxor wait_log lor next_wait_log
+  (* We recompute [wait_log] to reduce register pressure. *)
+  let wait_log = get_wait_log backoff in
+  (* [Bool.to_int] generates branchless code, this reduces branch predictor
+     pressure and generates shorter code. *)
+  let next_wait_log = wait_log + Bool.to_int (wait_log < upper_wait_log) in
+  backoff - wait_log + next_wait_log
 
 let default = create ()
