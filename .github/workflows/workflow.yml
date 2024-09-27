@@ -1,4 +1,4 @@
-name: build-and-test
+name: ci
 
 on:
   pull_request:
@@ -7,20 +7,28 @@ on:
       - main
 
 jobs:
-  build-windows:
+  test-on-windows:
+    strategy:
+      fail-fast: false
+      matrix:
+        ocaml-compiler:
+          - ocaml.5.0.0,ocaml-option-mingw
+          - ocaml.5.1.1,ocaml-option-mingw
+          - ocaml.5.2.0,ocaml-option-mingw
+
     runs-on: windows-latest
 
     steps:
-      - name: Checkout code
+      - name: Check out code
         uses: actions/checkout@v3
 
-      - name: Set-up OCaml
-        uses: ocaml/setup-ocaml@v2
+      - name: Set up OCaml
+        uses: ocaml/setup-ocaml@v3
         with:
-          ocaml-compiler: ocaml.5.0.0,ocaml-option-mingw
+          ocaml-compiler: ${{ matrix.ocaml-compiler }}
           opam-repositories: |
             dra27: https://github.com/dra27/opam-repository.git#windows-5.0
-            default: https://github.com/fdopen/opam-repository-mingw.git#opam2
+            default: https://github.com/ocaml-opam/opam-repository-mingw.git#sunset
             standard: https://github.com/ocaml/opam-repository.git
 
       - name: Install dependencies
