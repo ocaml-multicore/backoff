@@ -12,4 +12,5 @@
  (depends
   (ocaml (>= 4.12))
   (alcotest (and (>= 1.7.0) :with-test))
+  (yojson (and (>= 2.0.2) :with-test))
   (domain_shims (and (>= 0.1.0) :with-test))))
